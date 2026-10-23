@@ -1,0 +1,90 @@
+.scaled-board {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.board {
+  position: relative;
+  overflow: hidden;
+  background: #b9bcc1;
+  user-select: none;
+}
+
+/* "Originale" style: hammered silver frame, red paper, dark cardboard cards. */
+.board-frame {
+  position: absolute;
+  inset: 0;
+  background-color: #c4c7cc;
+  background-size: 100% 100%, 240px 240px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    inset 0 0 10px rgba(0, 0, 0, 0.45);
+}
+
+.board-paper {
+  position: absolute;
+  background-color: #cd3a2a;
+  background-size: 256px 256px, 1024px 1024px, 100% 100%;
+}
+
+.board-paper.framed {
+  box-shadow:
+    0 0 0 2px rgba(70, 70, 75, 0.55),
+    inset 3px 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* The drop shadow sits on the wrapper because clip-path (hand-cut edges) would cut it off. */
+.card-wrap {
+  position: absolute;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+}
+
+.card {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #2c2320;
+  background-size: 256px 256px, 512px 512px, 100% 100%;
+  color: var(--ink);
+  position: relative;
+}
+
+.card-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.card.sold-out .card-slot {
+  opacity: 0.35;
+}
+
+.leaf {
+  position: absolute;
+  top: 7%;
+  right: 3.5%;
+  color: #9edcaa;
+}
+
+.sold-out-band {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 50%;
+  transform: translateY(-50%) rotate(-7deg);
+  padding: 0.12em 0;
+  text-align: center;
+  white-space: nowrap;
+  color: #b3261e;
+  background: #f4efe4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
