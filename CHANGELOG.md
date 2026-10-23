@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.0: style presets (burst 2, awaiting approval)
+## v0.2.0: style presets (2026-10-24)
 
 - Four presets, each with live thumbnails in the editor:
   - **Classica**: the real board.
