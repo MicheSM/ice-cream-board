@@ -33,7 +33,7 @@ h3 {
 /* Layout: header on top, then flavours | preview | settings. */
 .editor {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 270px;
+  grid-template-columns: 290px minmax(0, 1fr) 300px;
   grid-template-rows: auto minmax(0, 1fr);
   height: 100vh;
 }
@@ -334,6 +334,10 @@ label output {
   gap: 6px;
 }
 
+.settings section {
+  margin-bottom: 6px;
+}
+
 .segmented button.active {
   background: var(--accent-soft);
   border-color: var(--accent);
@@ -478,4 +482,105 @@ label output {
 
 .pick-list small {
   margin-left: auto;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+  margin: 0 4px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.section-head h3 {
+  margin-right: auto;
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
+  margin: 4px 0 6px;
+}
+
+label.indent {
+  margin-left: 25px;
+}
+
+/* Preset gallery: 2×2 live thumbnails */
+.presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0 8px;
+}
+
+.preset {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  border-width: 2px;
+}
+
+.preset.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.preset-thumb {
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.preset span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.modified {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d08a2e;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.swatch {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.swatch.active {
+  box-shadow:
+    0 0 0 2px white,
+    0 0 0 4px var(--accent);
+}
+
+.segmented button {
+  margin-bottom: 12px;
+}
+
+.topbar-actions button.icon {
+  font-size: 19px;
 }

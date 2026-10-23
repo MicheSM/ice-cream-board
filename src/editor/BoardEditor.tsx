@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ScaledBoard } from '../board/Board';
 import { cellRect } from '../board/layout';
+import { chromeOf } from '../board/themes';
 import { pickData, useStore } from '../model/store';
 import { cellKey, type FlavorId } from '../model/types';
 import { droppedFlavor, isFlavorDrag, startFlavorDrag } from './dnd';
@@ -17,12 +18,13 @@ export function BoardEditor() {
   const [menu, setMenu] = useState<{ row: number; col: number } | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const { board } = data;
+  const chrome = chromeOf(data.style);
 
   const cells: ReactNode[] = [];
   for (let row = 0; row < board.rows; row++)
     for (let col = 0; col < board.cols; col++) {
       const key = cellKey(row, col);
-      const r = cellRect(board, row, col);
+      const r = cellRect(board, chrome, row, col);
       const placement = board.cells[key];
       cells.push(
         <div

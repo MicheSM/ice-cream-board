@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { redo, undo, useHistory } from '../model/history';
 import { CastControls } from './CastControls';
 import { FlavorList } from './FlavorList';
 import { BoardEditor } from './BoardEditor';
@@ -6,12 +7,36 @@ import { SettingsPanel } from './SettingsPanel';
 
 export function EditorApp() {
   const [help, setHelp] = useState(false);
+  const { canUndo, canRedo } = useHistory();
+
+  // Ctrl+Z / Ctrl+Y (or Ctrl+Shift+Z). Inside a text field the browser's own
+  // undo for that field wins.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if ((e.target as HTMLElement).closest('input, textarea, select')) return;
+      const key = e.key.toLowerCase();
+      if (key === 'z' && !e.shiftKey) undo();
+      else if (key === 'y' || (key === 'z' && e.shiftKey)) redo();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <div className="editor">
       <header className="topbar">
         <h1>🍦 Ice Cream Board</h1>
         <div className="topbar-actions">
+          <button className="icon" onClick={undo} disabled={!canUndo} title="Annulla (Ctrl+Z)" aria-label="Annulla">
+            ↶
+          </button>
+          <button className="icon" onClick={redo} disabled={!canRedo} title="Ripeti (Ctrl+Y)" aria-label="Ripeti">
+            ↷
+          </button>
+          <span className="divider" />
           <CastControls />
           <button className="ghost" onClick={() => setHelp(!help)} aria-expanded={help}>
             ? Aiuto

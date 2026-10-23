@@ -29,8 +29,6 @@ export interface CardFit {
 }
 
 export const LINE_HEIGHT = 1.08;
-/** Share of the card height given to the major text when there is a minor. */
-export const MAJOR_SHARE = 0.56;
 /** How much bigger a major-only card may get than the board size. */
 export const SOLO_BOOST = 1.3;
 /** The minor text is never bigger than this fraction of the major size. */
@@ -90,23 +88,23 @@ export function median(values: number[]): number {
 }
 
 export interface FitOptions {
-  /** The text area of one card (card size minus padding). */
-  box: Box;
+  /** Text areas of a card: major and minor when there is a minor, solo when there isn't. */
+  majorBox: Box;
+  minorBox: Box;
+  soloBox: Box;
   majorFont: string;
   minorFont: string;
   measure: Measure;
 }
 
 export function fitBoard(cards: Array<{ major: string; minor: string }>, opts: FitOptions): CardFit[] {
-  const { box, majorFont, minorFont, measure } = opts;
-  const majorBox = { w: box.w, h: box.h * MAJOR_SHARE };
-  const minorBox = { w: box.w, h: box.h * (1 - MAJOR_SHARE) };
+  const { majorBox, minorBox, soloBox, majorFont, minorFont, measure } = opts;
 
   const prepared = cards.map((c) => {
     const hasMinor = c.minor.trim() !== '';
     return {
       hasMinor,
-      majorOptions: candidates(c.major, hasMinor ? majorBox : box, majorFont, measure),
+      majorOptions: candidates(c.major, hasMinor ? majorBox : soloBox, majorFont, measure),
       minorOptions: hasMinor ? candidates(c.minor, minorBox, minorFont, measure) : null,
     };
   });

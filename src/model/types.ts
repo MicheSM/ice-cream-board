@@ -13,7 +13,7 @@ export interface Flavor {
   soldOut: boolean;
 }
 
-/** Random offsets in [-1, 1], scaled by the board's "natural" level. */
+/** Random offsets in [-1, 1], used when the "natural" effect is on. */
 export interface Jitter {
   x: number;
   y: number;
@@ -25,27 +25,51 @@ export interface Placement {
   jitter: Jitter;
 }
 
-/** 0 = precise, 1..3 = increasingly natural (rotated, offset) placement. */
-export type NaturalLevel = 0 | 1 | 2 | 3;
-
+/** Where the cards are. How they look is in StyleConfig. */
 export interface BoardConfig {
   rows: number;
   cols: number;
   /** Key is cellKey(row, col). Empty cells have no entry. */
   cells: Record<string, Placement>;
-  /** Card size as a fraction of its grid cell (same for every card). */
-  cardScale: number;
-  natural: NaturalLevel;
-  frame: boolean;
 }
 
-export type FontId = 'patrick-hand' | 'gochi-hand' | 'kalam' | 'caveat';
+export type FontId =
+  | 'patrick-hand'
+  | 'gochi-hand'
+  | 'kalam'
+  | 'caveat'
+  | 'bebas-neue'
+  | 'amatic-sc'
+  | 'fredoka'
+  | 'nunito';
 
-export interface StyleConfig {
+export type ThemeId = 'classica' | 'argento' | 'lavagna' | 'pastello';
+
+/** Everything the user can tune on top of a preset. Each preset has its own defaults. */
+export interface Tunables {
+  frame: boolean;
+  /** Band at the top with the shop logo and the title. */
+  header: boolean;
+  /** Slightly rotated and offset cards, like they were stuck on by hand. */
+  natural: boolean;
+  /** Card size as a fraction of its grid cell (same for every card). */
+  cardScale: number;
+  /** Id of one of the preset's background swatches. */
+  background: string;
+  /** Id of one of the preset's card swatches. */
+  card: string;
   majorFont: FontId;
   minorFont: FontId;
   majorUppercase: boolean;
   leafIcon: boolean;
+}
+
+export interface StyleConfig {
+  theme: ThemeId;
+  /** Only what the user changed, per preset. Missing keys use the preset's defaults. */
+  overrides: Partial<Record<ThemeId, Partial<Tunables>>>;
+  /** Title shown in the header band. */
+  title: string;
 }
 
 export interface AppData {

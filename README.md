@@ -21,8 +21,8 @@ npm run preview    # serves dist/ on http://localhost:4173
 
 | Piece | What it does |
 |---|---|
-| `src/model/` | The data (flavours, board, style) and every action that changes it. Stored with Zustand and saved to `localStorage`. |
-| `src/board/` | Draws the board on a fixed 1920×1080 canvas, scaled to the screen. `textFit.ts` picks font sizes, `layout.ts` the geometry, `textures.ts` the procedural textures. |
+| `src/model/` | The data (flavours, board, style) and every action that changes it. Stored with Zustand and saved to `localStorage`. `themeDefaults.ts` has each preset's defaults, `migrate.ts` converts data saved by older versions, `history.ts` is undo/redo. |
+| `src/board/` | Draws the board on a fixed 1920×1080 canvas, scaled to the screen. `themes.ts` describes each preset's visuals, `textFit.ts` picks font sizes, `layout.ts` the geometry, `textures.ts` the procedural textures. |
 | `src/editor/` | The editor UI. |
 | `src/display/` | The display page. |
 | `src/cast/` | "Proietta": casting with the Presentation API. |

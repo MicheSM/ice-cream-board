@@ -4,7 +4,14 @@ import { bestFit, candidates, fitBoard, median, SOLO_BOOST, type Measure } from 
 // A fake font where every character is 0.5em wide: at 100px, "ABCD" = 200.
 const measure: Measure = (text) => text.length * 50;
 const box = { w: 400, h: 200 };
-const opts = { box, majorFont: 'f', minorFont: 'f', measure };
+const opts = {
+  majorBox: { w: 400, h: 112 },
+  minorBox: { w: 400, h: 88 },
+  soloBox: box,
+  majorFont: 'f',
+  minorFont: 'f',
+  measure,
+};
 
 describe('candidates / bestFit', () => {
   it('keeps short words on one line', () => {

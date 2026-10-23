@@ -1,5 +1,6 @@
 import type { AppData, Flavor, Jitter, Placement } from './types';
 import { cellKey } from './types';
+import { DEFAULT_TITLE } from './themeDefaults';
 
 export const randomJitter = (): Jitter => ({
   x: Math.random() * 2 - 1,
@@ -42,7 +43,7 @@ export function makeDefaultData(): AppData {
 
   return {
     flavors,
-    board: { rows, cols, cells, cardScale: 0.94, natural: 1, frame: true },
-    style: { majorFont: 'patrick-hand', minorFont: 'patrick-hand', majorUppercase: true, leafIcon: true },
+    board: { rows, cols, cells },
+    style: { theme: 'classica', overrides: {}, title: DEFAULT_TITLE },
   };
 }

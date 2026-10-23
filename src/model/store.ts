@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppData, BoardConfig, Flavor, FlavorId, NaturalLevel, Placement, StyleConfig } from './types';
+import type { AppData, Flavor, FlavorId, Placement, ThemeId, Tunables } from './types';
 import { cellKey } from './types';
 import { makeDefaultData, randomJitter } from './defaults';
+import { DATA_VERSION, migrate } from './migrate';
 
 export const STORAGE_KEY = 'ice-cream-board';
 
@@ -15,10 +16,14 @@ interface Actions {
   clearCell: (row: number, col: number) => void;
   removeFromBoard: (id: FlavorId) => void;
   setGrid: (rows: number, cols: number) => void;
-  setBoard: (patch: Partial<Pick<BoardConfig, 'cardScale' | 'frame'>>) => void;
-  /** Levels 1..3 re-roll every card's random offsets, so pressing the same button again gives a new arrangement. */
-  setNatural: (level: NaturalLevel) => void;
-  setStyle: (patch: Partial<StyleConfig>) => void;
+  setTheme: (theme: ThemeId) => void;
+  /** Change one setting of the current preset. */
+  setTunable: <K extends keyof Tunables>(key: K, value: Tunables[K]) => void;
+  /** Back to the current preset's defaults. */
+  resetTheme: () => void;
+  setTitle: (title: string) => void;
+  /** Re-roll every card's random offsets: pressing "Naturale" again gives a new arrangement. */
+  shuffle: () => void;
   replaceData: (data: AppData) => void;
   resetAll: () => void;
 }
@@ -95,17 +100,29 @@ export const useStore = create<State>()(
           return { board: { ...s.board, rows, cols, cells } };
         }),
 
-      setBoard: (patch) => set((s) => ({ board: { ...s.board, ...patch } })),
+      setTheme: (theme) => set((s) => ({ style: { ...s.style, theme } })),
 
-      setNatural: (level) =>
+      setTunable: (key, value) =>
         set((s) => {
-          if (level === 0) return { board: { ...s.board, natural: 0 } };
-          const cells: Record<string, Placement> = {};
-          for (const [k, p] of Object.entries(s.board.cells)) cells[k] = { ...p, jitter: randomJitter() };
-          return { board: { ...s.board, natural: level, cells } };
+          const { theme, overrides } = s.style;
+          return { style: { ...s.style, overrides: { ...overrides, [theme]: { ...overrides[theme], [key]: value } } } };
         }),
 
-      setStyle: (patch) => set((s) => ({ style: { ...s.style, ...patch } })),
+      resetTheme: () =>
+        set((s) => {
+          const overrides = { ...s.style.overrides };
+          delete overrides[s.style.theme];
+          return { style: { ...s.style, overrides } };
+        }),
+
+      setTitle: (title) => set((s) => ({ style: { ...s.style, title } })),
+
+      shuffle: () =>
+        set((s) => {
+          const cells: Record<string, Placement> = {};
+          for (const [k, p] of Object.entries(s.board.cells)) cells[k] = { ...p, jitter: randomJitter() };
+          return { board: { ...s.board, cells } };
+        }),
 
       replaceData: (data) => set(pickData(data)),
 
@@ -113,13 +130,19 @@ export const useStore = create<State>()(
     }),
     {
       name: STORAGE_KEY,
-      // Bump this when AppData changes shape, and convert old data in `migrate`,
-      // so an update never wipes the shop's flavours.
-      version: 1,
+      // When AppData changes shape, bump DATA_VERSION and add a step in
+      // migrate.ts: data saved by an older version is converted on load, so an
+      // update never wipes the shop's flavours.
+      version: DATA_VERSION,
+      migrate: (persisted, version) => migrate(persisted, version),
       partialize: (s: State) => pickData(s),
     },
   ),
 );
+
+let external = false;
+/** True while the state is being reloaded because another window changed it. */
+export const isExternalUpdate = () => external;
 
 /**
  * Keep every open window of the app in sync. When one window writes to
@@ -127,7 +150,13 @@ export const useStore = create<State>()(
  * of the same site; they reload the state from storage and re-render.
  */
 export function syncAcrossWindows() {
-  window.addEventListener('storage', (e) => {
-    if (e.key === STORAGE_KEY) void useStore.persist.rehydrate();
+  window.addEventListener('storage', async (e) => {
+    if (e.key !== STORAGE_KEY) return;
+    external = true;
+    try {
+      await useStore.persist.rehydrate();
+    } finally {
+      external = false;
+    }
   });
 }

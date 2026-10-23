@@ -1,9 +1,9 @@
 import { seededRandom } from './layout';
 
 // Procedural textures: small SVG images built from noise filters
-// (feTurbulence = Perlin noise, feDiffuseLighting = lights it like a bumpy
-// surface). They're inlined as data: URLs and tiled as CSS backgrounds, so
-// there are no image files to license or download.
+// (feTurbulence = Perlin noise) or random shapes. They're inlined as data:
+// URLs and tiled as CSS backgrounds, so there are no image files to license
+// or download.
 
 const svgUrl = (body: string, size: number) =>
   `url("data:image/svg+xml,${encodeURIComponent(
@@ -71,7 +71,34 @@ function hammered(size: number, count: number) {
 
 export const HAMMERED_SILVER = hammered(240, 520);
 
-export const PAPER_GRAIN = noise({ freq: '0.9', octaves: 2, color: [60, 10, 5], alpha: 0.35, seed: 3, size: 256 });
-export const PAPER_BLOTCHES = noise({ freq: '0.006', octaves: 3, color: [90, 15, 5], alpha: 0.4, seed: 8, size: 1024 });
+/**
+ * Wood: noise stretched along one axis gives long streaks; a colour matrix
+ * maps the noise value to a range of browns. `vertical` turns the grain for
+ * the left and right sides of a frame.
+ */
+function wood(vertical: boolean) {
+  const freq = vertical ? '0.09 0.004' : '0.004 0.09';
+  return svgUrl(
+    `<filter id='w' x='0' y='0' width='100%' height='100%'>` +
+      `<feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='4' seed='21' stitchTiles='stitch'/>` +
+      `<feColorMatrix values='0.42 0 0 0 0.22  0.28 0 0 0 0.12  0.16 0 0 0 0.05  0 0 0 0 1'/>` +
+      `</filter><rect width='100%' height='100%' filter='url(#w)'/>`,
+    600,
+  );
+}
+
+export const WOOD_H = wood(false);
+export const WOOD_V = wood(true);
+
+/** Paper: fine grain plus large soft blotches, darker than the base colour. */
+export const PAPER_GRAIN = noise({ freq: '0.9', octaves: 2, color: [40, 15, 5], alpha: 0.3, seed: 3, size: 256 });
+export const PAPER_BLOTCHES = noise({ freq: '0.006', octaves: 3, color: [50, 20, 8], alpha: 0.35, seed: 8, size: 1024 });
+
+/** Chalkboard: white dust and the smudges left by an eraser. */
+export const CHALK_DUST = noise({ freq: '0.8', octaves: 2, color: [255, 255, 255], alpha: 0.14, seed: 13, size: 256 });
+export const CHALK_SMUDGES = noise({ freq: '0.004 0.008', octaves: 3, color: [255, 255, 255], alpha: 0.16, seed: 17, size: 1024 });
+
+/** Cardboard and polaroid paper. */
 export const CARD_GRAIN = noise({ freq: '0.7', octaves: 2, color: [140, 120, 105], alpha: 0.22, seed: 5, size: 256 });
 export const CARD_FIBERS = noise({ freq: '0.012 0.25', octaves: 2, color: [10, 6, 4], alpha: 0.35, seed: 9, size: 512 });
+export const FINE_GRAIN = noise({ freq: '1.2', octaves: 1, color: [90, 80, 70], alpha: 0.1, seed: 31, size: 200 });

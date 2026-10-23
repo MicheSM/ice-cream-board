@@ -1,20 +1,20 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { ScaledBoard } from '../board/Board';
 import { FONTS } from '../board/fonts';
+import { THEMES } from '../board/themes';
+import { DATA_VERSION, migrate } from '../model/migrate';
 import { pickData, useStore } from '../model/store';
-import type { AppData, FontId, NaturalLevel } from '../model/types';
-
-const NATURAL: Array<[NaturalLevel, string]> = [
-  [0, 'Preciso'],
-  [1, 'Naturale 1'],
-  [2, 'Naturale 2'],
-  [3, 'Naturale 3'],
-];
+import { THEME_IDS, hasOverrides, resolveTunables } from '../model/themeDefaults';
+import type { AppData, FontId, ThemeId } from '../model/types';
 
 /** Right panel: how the board looks. */
 export function SettingsPanel() {
-  const board = useStore((s) => s.board);
   const style = useStore((s) => s.style);
-  const { setGrid, setBoard, setNatural, setStyle } = useStore.getState();
+  const board = useStore((s) => s.board);
+  const { setGrid, setTunable, resetTheme, setTitle, shuffle } = useStore.getState();
+  const theme = THEMES[style.theme];
+  const t = resolveTunables(style);
 
   const resize = (rows: number, cols: number) => {
     if (rows < 1 || cols < 1 || rows > 8 || cols > 8) return;
@@ -28,64 +28,152 @@ export function SettingsPanel() {
 
   return (
     <aside className="panel settings">
-      <h2>Lavagna</h2>
+      <h2>Stile</h2>
+      <PresetGallery />
+      <p className="muted">{theme.description}</p>
 
       <section>
-        <h3>Griglia</h3>
-        <Stepper label="Righe" value={board.rows} onChange={(n) => resize(n, board.cols)} />
-        <Stepper label="Colonne" value={board.cols} onChange={(n) => resize(board.rows, n)} />
+        <div className="section-head">
+          <h3>Personalizza</h3>
+          <button
+            className="small ghost"
+            disabled={!hasOverrides(style)}
+            onClick={resetTheme}
+            title="Torna alle impostazioni predefinite di questo stile"
+          >
+            ↺ Ripristina
+          </button>
+        </div>
+
+        <span className="field-label">Sfondo</span>
+        <Swatches items={theme.backgrounds} value={t.background} onChange={(id) => setTunable('background', id)} />
+        {theme.cards.length > 1 && (
+          <>
+            <span className="field-label">Cartoncini</span>
+            <Swatches items={theme.cards} value={t.card} onChange={(id) => setTunable('card', id)} />
+          </>
+        )}
+
+        <span className="field-label">Effetto</span>
+        <div className="segmented">
+          <button className={!t.natural ? 'active' : ''} onClick={() => setTunable('natural', false)}>
+            Preciso
+          </button>
+          <button
+            className={t.natural ? 'active' : ''}
+            onClick={() => (t.natural ? shuffle() : setTunable('natural', true))}
+            title="Clicca di nuovo per una nuova disposizione"
+          >
+            Naturale {t.natural && '↻'}
+          </button>
+        </div>
+
         <label>
-          Dimensione cartoncini <output>{Math.round(board.cardScale * 100)}%</output>
+          Dimensione cartoncini <output>{Math.round(t.cardScale * 100)}%</output>
           <input
             type="range"
             min={60}
             max={100}
-            value={Math.round(board.cardScale * 100)}
-            onChange={(e) => setBoard({ cardScale: Number(e.target.value) / 100 })}
+            value={Math.round(t.cardScale * 100)}
+            onChange={(e) => setTunable('cardScale', Number(e.target.value) / 100)}
           />
         </label>
-      </section>
 
-      <section>
-        <h3>Effetto</h3>
-        <div className="segmented">
-          {NATURAL.map(([level, label]) => (
-            <button
-              key={level}
-              className={board.natural === level ? 'active' : ''}
-              onClick={() => setNatural(level)}
-              title={level > 0 ? 'Clicca di nuovo per una nuova disposizione' : ''}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h3>Aspetto</h3>
         <label className="check">
-          <input type="checkbox" checked={board.frame} onChange={(e) => setBoard({ frame: e.target.checked })} />
+          <input type="checkbox" checked={t.frame} onChange={(e) => setTunable('frame', e.target.checked)} />
           Cornice
         </label>
         <label className="check">
-          <input type="checkbox" checked={style.leafIcon} onChange={(e) => setStyle({ leafIcon: e.target.checked })} />
+          <input type="checkbox" checked={t.header} onChange={(e) => setTunable('header', e.target.checked)} />
+          Intestazione con logo
+        </label>
+        {t.header && (
+          <label className="indent">
+            Titolo
+            <input value={style.title} onChange={(e) => setTitle(e.target.value)} />
+          </label>
+        )}
+        <label className="check">
+          <input type="checkbox" checked={t.leafIcon} onChange={(e) => setTunable('leafIcon', e.target.checked)} />
           Foglia sui gusti vegani
         </label>
         <label className="check">
           <input
             type="checkbox"
-            checked={style.majorUppercase}
-            onChange={(e) => setStyle({ majorUppercase: e.target.checked })}
+            checked={t.majorUppercase}
+            onChange={(e) => setTunable('majorUppercase', e.target.checked)}
           />
           Nome in MAIUSCOLO
         </label>
-        <FontSelect label="Font nome" value={style.majorFont} onChange={(f) => setStyle({ majorFont: f })} />
-        <FontSelect label="Font sottotitolo" value={style.minorFont} onChange={(f) => setStyle({ minorFont: f })} />
+        <FontSelect label="Font nome" value={t.majorFont} onChange={(f) => setTunable('majorFont', f)} />
+        <FontSelect label="Font sottotitolo" value={t.minorFont} onChange={(f) => setTunable('minorFont', f)} />
+      </section>
+
+      <section>
+        <h3>Griglia</h3>
+        <Stepper label="Righe" value={board.rows} onChange={(n) => resize(n, board.cols)} />
+        <Stepper label="Colonne" value={board.cols} onChange={(n) => resize(board.rows, n)} />
       </section>
 
       <Backup />
     </aside>
+  );
+}
+
+/** One live thumbnail per preset: the real board, drawn small, with the user's tweaks. */
+function PresetGallery() {
+  const data = useStore(useShallow(pickData));
+  const setTheme = useStore((s) => s.setTheme);
+  const previews = useMemo(
+    () => THEME_IDS.map((id): [ThemeId, AppData] => [id, { ...data, style: { ...data.style, theme: id } }]),
+    [data],
+  );
+
+  return (
+    <div className="presets">
+      {previews.map(([id, d]) => (
+        <button
+          key={id}
+          className={`preset ${data.style.theme === id ? 'active' : ''}`}
+          onClick={() => setTheme(id)}
+          aria-pressed={data.style.theme === id}
+        >
+          <div className="preset-thumb" aria-hidden="true">
+            <ScaledBoard data={d} />
+          </div>
+          <span>
+            {THEMES[id].name}
+            {hasOverrides(data.style, id) && <i className="modified" title="Personalizzato" />}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Swatches({
+  items,
+  value,
+  onChange,
+}: {
+  items: Array<{ id: string; label: string; dot: string }>;
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className="swatches">
+      {items.map((s) => (
+        <button
+          key={s.id}
+          className={`swatch ${s.id === value ? 'active' : ''}`}
+          style={{ background: s.dot }}
+          title={s.label}
+          aria-label={s.label}
+          aria-pressed={s.id === value}
+          onClick={() => onChange(s.id)}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -110,8 +198,8 @@ function FontSelect({ label, value, onChange }: { label: string; value: FontId; 
       {label}
       <select value={value} onChange={(e) => onChange(e.target.value as FontId)}>
         {Object.entries(FONTS).map(([id, f]) => (
-          <option key={id} value={id} style={{ fontFamily: f.family }}>
-            {f.label}
+          <option key={id} value={id}>
+            {f.label} ({f.family})
           </option>
         ))}
       </select>
@@ -127,9 +215,9 @@ function Backup() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const exportFile = () => {
-    const json = JSON.stringify({ app: 'ice-cream-board', version: 1, data: pickData(useStore.getState()) }, null, 2);
+    const payload = { app: 'ice-cream-board', version: DATA_VERSION, data: pickData(useStore.getState()) };
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
     a.download = `ice-cream-board-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
@@ -137,9 +225,11 @@ function Backup() {
 
   const importFile = async (file: File) => {
     try {
-      const { data } = JSON.parse(await file.text());
-      if (!isAppData(data)) throw new Error('bad file');
-      if (confirm('Sostituire tutti i gusti e le impostazioni con quelli del file?')) useStore.getState().replaceData(data);
+      const { version, data } = JSON.parse(await file.text());
+      // Backups made by older versions are converted like stored data is.
+      const current = migrate(data, version ?? 1);
+      if (!isAppData(current)) throw new Error('bad file');
+      if (confirm('Sostituire tutti i gusti e le impostazioni con quelli del file?')) useStore.getState().replaceData(current);
     } catch {
       alert('File non valido.');
     }

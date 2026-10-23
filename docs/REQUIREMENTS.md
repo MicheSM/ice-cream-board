@@ -28,13 +28,14 @@
 | B5 | Optional leaf icon on vegan cards. |
 | B6 | "Esaurito / Sold out" mark without removing the card. |
 | C1 | Background + optional frame. Toggling the frame re-flows the cards to use the space. |
-| C2 | **Grid mode**: rows × columns. Place or remove a card in any cell without moving the others. All cards have the same, configurable size. |
-| C3 | **Manual mode**: card size chosen by hand (same for all cards), cards placed freely by dragging. |
-| C4 | Effect buttons: **Preciso / Naturale 1 / 2 / 3**. Natural n gives random rotation and offset with magnitude ∝ n. Pressing it again re-rolls. Stable across reloads. |
+| C2 | **Grid**: rows × columns. Place or remove a card in any cell without moving the others. All cards have the same, configurable size. *(Manual free placement dropped on 2026-10-24: the grid is enough.)* |
+| C4 | Effect: **Preciso / Naturale** (small random rotation and offset). Pressing Naturale again re-rolls. Stable across reloads. |
 | D1 | Major/minor text slots. Without a minor, the major gets the whole card. |
 | D2 | Font sizes consistent across cards (board-wide size). Only long names shrink or wrap to 2 lines. The minor is never bigger than the major. |
 | D3 | Fonts chosen from a small curated list, bundled offline. |
-| E1 | Style presets: **Originale** (replica of the real board) plus a few others, each with the vegan colour code. |
+| E1 | Style presets: **Classica** (replica of the real board), **Argento** (shop logo/poster), **Lavagna**, **Pastello**, each with the vegan colour code. |
+| E2 | Every preset is tunable (colours, frame, logo header, effect, size, fonts…) with a reset to its sane defaults. Tweaks are remembered per preset. |
+| F2 | Undo/redo. |
 | F1 | Italian, intuitive editor with a live preview. Works with mouse and touch. Autosave. |
 | G1 | Data survives reload and reboot. Export/import backup file. App updates never lose data (versioned data + migrations). |
 
