@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0: first prototype (burst 1, awaiting approval)
+## v0.1.0: first prototype (2026-10-24)
 
 - "Originale" look: hammered chrome frame, red paper, dark cardboard cards with hand-cut edges, chalk-marker font. Green = vegan, white = not.
 - Today's 13 flavours preloaded.
