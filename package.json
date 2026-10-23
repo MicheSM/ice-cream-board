@@ -1,6 +1,6 @@
 {
   "name": "ice-cream-board",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Virtual flavour board for an ice cream shop, projected on a monitor via Chromecast",
   "type": "module",
@@ -25,6 +25,7 @@
     "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",

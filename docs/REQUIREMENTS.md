@@ -38,6 +38,9 @@
 | F2 | Undo/redo. |
 | F1 | Italian, intuitive editor with a live preview. Works with mouse and touch. Autosave. |
 | G1 | Data survives reload and reboot. Export/import backup file. App updates never lose data (versioned data + migrations). |
+| H1 | Hosted at a fixed HTTPS address (GitHub Pages), published automatically from `main` once the tests pass. |
+| H2 | Installable as an app; opens without internet; a reload picks up the latest version. |
+| H3 | A drawing error never shows on the monitor, and the editor stays usable to fix it. The board window keeps the screen awake. No memory growth over long runs. |
 
 ## Non-functional
 

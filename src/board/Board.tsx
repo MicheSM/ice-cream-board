@@ -21,6 +21,7 @@ import {
 import { fitBoard, LINE_HEIGHT, type CardFit, type Measure } from './textFit';
 import { THEMES, chromeOf, swatch, type CardSwatch, type ThemeVisual } from './themes';
 import { FINE_GRAIN } from './textures';
+import { BoardBoundary } from './BoardBoundary';
 import './board.css';
 
 // Measures text with the real font via an off-screen <canvas>. `font` is a
@@ -311,7 +312,9 @@ export function ScaledBoard({ data, children }: { data: AppData; children?: Reac
     <div ref={ref} className="scaled-board">
       <div style={{ width: BOARD_W * scale, height: BOARD_H * scale, flex: 'none' }}>
         <div style={{ transform: `scale(${scale})`, transformOrigin: '0 0' }}>
-          <Board data={data}>{children}</Board>
+          <BoardBoundary resetKey={data} fallback={<div className="board" style={{ width: BOARD_W, height: BOARD_H }}>{children}</div>}>
+            <Board data={data}>{children}</Board>
+          </BoardBoundary>
         </div>
       </div>
     </div>

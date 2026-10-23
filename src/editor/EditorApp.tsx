@@ -76,6 +76,18 @@ function Help({ onClose }: { onClose: () => void }) {
         Ogni modifica fatta qui appare subito sul monitor. Se chiudi la finestra della lavagna, la proiezione si ferma:
         il monitor non mostra mai il resto del computer.
       </p>
+      <h2>Buono a sapersi</h2>
+      <ul>
+        <li>
+          I gusti si salvano da soli, su questo computer. Ogni tanto fai <b>Backup → Esporta</b> (in fondo a destra) e
+          tieni il file al sicuro: con <b>Importa…</b> li ritrovi anche su un altro computer.
+        </li>
+        <li>Funziona anche senza internet: per il Chromecast basta il Wi-Fi del negozio.</li>
+        <li>
+          Se qualcosa non va, ricarica la pagina (<b>Ctrl+R</b>): prende anche l'ultima versione dell'app.
+        </li>
+      </ul>
+      <p className="version">Versione {__APP_VERSION__}</p>
     </div>
   );
 }

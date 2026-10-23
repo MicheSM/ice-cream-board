@@ -425,6 +425,16 @@ label output {
   margin-bottom: 4px;
 }
 
+.help ul {
+  padding-left: 20px;
+}
+
+.help .version {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .help .close {
   position: absolute;
   top: 8px;

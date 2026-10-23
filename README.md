@@ -2,6 +2,8 @@
 
 A virtual flavour board for an ice cream shop: a web app that shows the available flavours on a monitor (through a Chromecast or HDMI) and lets the staff change them from a computer behind the counter.
 
+**Live:** https://michesm.github.io/ice-cream-board/ (setup at the shop: `docs/SHOP-SETUP.md`).
+
 - `index.html`: the **editor** (flavours, board, settings).
 - `display.html`: the **board** only, the page that goes on the monitor.
 
@@ -26,8 +28,14 @@ npm run preview    # serves dist/ on http://localhost:4173
 | `src/editor/` | The editor UI. |
 | `src/display/` | The display page. |
 | `src/cast/` | "Proietta": casting with the Presentation API. |
+| `src/pwa/` | Installable app and offline use: the service worker (`sw.js`, completed at build time by `vite.config.ts`) and its registration. |
+| `public/` | Files copied as they are: the app manifest and icons. |
 
 Windows stay in sync through the browser's `storage` event. A cast receiver gets the state as messages from the editor.
+
+## Deploy
+
+Every push to `main` runs `.github/workflows/deploy.yml` on GitHub: install, test, build, publish `dist/` on GitHub Pages. If a test fails nothing is published. Installed apps get the new version on their next reload. Pages, the HTML, is fetched network-first; everything else is served from the service worker's cache, since the file names change with the content.
 
 ## Stack
 

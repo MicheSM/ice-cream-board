@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.3.0: shop-ready (burst 3, to be confirmed at the shop)
+
+- Published on GitHub Pages: https://michesm.github.io/ice-cream-board/, rebuilt and republished automatically on every push to `main` (only if the tests pass).
+- Installable as an app ("Lavagna dei gusti", with the shop's logo as icon).
+- Works offline: a service worker saves every file of the app; a reload gets the latest version when online.
+- If the board ever fails to draw, the monitor shows nothing instead of an error, the editor stays usable, and the board comes back with the next change.
+- The board window (HDMI / Cast tab) keeps the screen from sleeping.
+- Asks the browser to keep the saved flavours even when the disk is nearly full.
+- App version in "? Aiuto", plus tips on backup, offline use and updates.
+- `docs/SHOP-SETUP.md`: Chromebook setup, casting options, test checklist.
+- Checked on a CPU slowed down 6×: the monitor loads in about 0.6 s, a sold-out toggle shows in about 80 ms, and a preset switch in under 0.3 s. After 1000 changes memory and page size stay flat.
+
 ## v0.2.0: style presets (2026-10-24)
 
 - Four presets, each with live thumbnails in the editor:

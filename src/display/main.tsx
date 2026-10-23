@@ -4,6 +4,7 @@ import { ScaledBoard } from '../board/Board';
 import { isReceiver, listenAsReceiver } from '../cast/presentation';
 import { useShallow } from 'zustand/react/shallow';
 import { pickData, syncAcrossWindows, useStore } from '../model/store';
+import { registerServiceWorker } from '../pwa/register';
 
 // The display page shows the board and nothing else. It gets its data either
 // from localStorage (a normal window/tab, kept fresh by `storage` events) or,
@@ -31,7 +32,22 @@ function DisplayApp() {
   );
 }
 
+// In a normal window (HDMI cable, or "Cast tab") the computer would dim the
+// screen and go to sleep after a few minutes. A wake lock keeps it on while
+// the board is visible. The browser drops the lock whenever the page is
+// hidden, so we ask again each time it comes back.
+function keepScreenOn() {
+  if (!('wakeLock' in navigator)) return;
+  const request = () => {
+    if (document.visibilityState === 'visible') navigator.wakeLock.request('screen').catch(() => {});
+  };
+  document.addEventListener('visibilitychange', request);
+  request();
+}
+
 syncAcrossWindows();
+registerServiceWorker();
+if (!isReceiver()) keepScreenOn();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "Lavagna dei gusti",
+  "short_name": "Gusti",
+  "description": "La lavagna dei gusti di Cioccolato Argento: modifica i gusti e proiettali sul monitor.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f1ec",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
