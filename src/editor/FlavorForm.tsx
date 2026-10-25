@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
+import { IngredientIcon } from '../board/ingredientIcons';
+import { INGREDIENT_IDS, INGREDIENTS, guessIngredient } from '../model/ingredients';
 import { useStore } from '../model/store';
+import { resolveTunables } from '../model/themeDefaults';
 import type { Flavor, FlavorId } from '../model/types';
 
 interface Props {
@@ -17,11 +20,12 @@ export function FlavorForm({ flavor, onDone }: Props) {
   const [minor, setMinor] = useState(flavor?.minor ?? '');
   const [vegan, setVegan] = useState(flavor?.vegan ?? false);
   const [soldOut, setSoldOut] = useState(flavor?.soldOut ?? false);
+  const [icon, setIcon] = useState(flavor?.icon);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!major.trim()) return;
-    const values = { major: major.trim(), minor: minor.trim(), vegan };
+    const values = { major: major.trim(), minor: minor.trim(), vegan, icon };
     if (flavor) {
       updateFlavor(flavor.id, { ...values, soldOut });
       onDone(flavor.id);
@@ -54,6 +58,7 @@ export function FlavorForm({ flavor, onDone }: Props) {
           <input type="checkbox" checked={soldOut} onChange={(e) => setSoldOut(e.target.checked)} /> Esaurito
         </label>
       )}
+      <IconPicker value={icon} guess={guessIngredient(major) ?? guessIngredient(minor)} onChange={setIcon} />
       <div className="form-actions">
         {flavor && (
           <button type="button" className="danger ghost" onClick={remove}>
@@ -69,5 +74,52 @@ export function FlavorForm({ flavor, onDone }: Props) {
         </button>
       </div>
     </form>
+  );
+}
+
+/**
+ * Which ingredient icon the flavour shows. "Auto" (the default) guesses it
+ * from the name, so it follows when you rename the flavour.
+ */
+function IconPicker({
+  value,
+  guess,
+  onChange,
+}: {
+  value: Flavor['icon'];
+  guess: ReturnType<typeof guessIngredient>;
+  onChange: (icon: Flavor['icon']) => void;
+}) {
+  const shown = value === undefined ? guess : value === 'none' ? null : value;
+  const iconsOn = useStore((s) => resolveTunables(s.style).ingredientIcon);
+  return (
+    <details className="icon-picker">
+      <summary>
+        Icona: {shown && <IngredientIcon id={shown} />}
+        {shown ? INGREDIENTS[shown].label : 'nessuna'}
+        {value === undefined && <small> (automatica)</small>}
+      </summary>
+      <div className="icon-grid">
+        <button type="button" className={value === undefined ? 'active' : ''} onClick={() => onChange(undefined)} title="Scelta in base al nome">
+          Auto
+        </button>
+        <button type="button" className={value === 'none' ? 'active' : ''} onClick={() => onChange('none')} title="Nessuna icona">
+          —
+        </button>
+        {INGREDIENT_IDS.map((id) => (
+          <button
+            key={id}
+            type="button"
+            className={value === id ? 'active' : ''}
+            onClick={() => onChange(id)}
+            title={INGREDIENTS[id].label}
+            aria-label={INGREDIENTS[id].label}
+          >
+            <IngredientIcon id={id} />
+          </button>
+        ))}
+      </div>
+      {!iconsOn && <small>Sulla lavagna si vedono attivando «Icona dell’ingrediente» nello stile.</small>}
+    </details>
   );
 }

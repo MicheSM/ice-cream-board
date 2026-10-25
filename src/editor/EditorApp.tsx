@@ -82,6 +82,10 @@ function Help({ onClose }: { onClose: () => void }) {
           I gusti si salvano da soli, su questo computer. Ogni tanto fai <b>Backup → Esporta</b> (in fondo a destra) e
           tieni il file al sicuro: con <b>Importa…</b> li ritrovi anche su un altro computer.
         </li>
+        <li>
+          Con <b>Icona dell’ingrediente</b> (in Stile) ogni gusto mostra un disegnino: è scelto dal nome, ma puoi
+          cambiarlo con <b>✎</b> → <b>Icona</b>.
+        </li>
         <li>Funziona anche senza internet: per il Chromecast basta il Wi-Fi del negozio.</li>
         <li>
           Se qualcosa non va, ricarica la pagina (<b>Ctrl+R</b>): prende anche l'ultima versione dell'app.

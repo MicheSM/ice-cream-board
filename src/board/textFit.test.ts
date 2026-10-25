@@ -82,3 +82,18 @@ describe('minor text', () => {
     for (const f of fits) expect(f.minor!.size).toBeLessThan(f.major.size);
   });
 });
+
+describe('letter spacing', () => {
+  it('keeps spaced-out capitals inside the box', () => {
+    // A tall box, so the width is what limits the size.
+    const wide = { ...opts, majorBox: { w: 400, h: 400 } };
+    const cards = [{ major: 'STRACCIATELLA', minor: 'Chocolate chip' }];
+    const [plain] = fitBoard(cards, wide);
+    const [spaced] = fitBoard(cards, { ...wide, majorTracking: 0.1 });
+    expect(spaced.major.size).toBeLessThan(plain.major.size);
+    for (const line of spaced.major.lines) {
+      const width = ((measure(line, 'f') + 0.1 * 100 * line.length) * spaced.major.size) / 100;
+      expect(width).toBeLessThanOrEqual(wide.majorBox.w);
+    }
+  });
+});

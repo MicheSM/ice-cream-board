@@ -11,7 +11,39 @@ export interface Flavor {
   minor: string;
   vegan: boolean;
   soldOut: boolean;
+  /** Icon of the main ingredient: a chosen one, 'none', or missing = guessed from the name. */
+  icon?: IngredientId | 'none';
 }
+
+/** The ingredients we have an icon for (see src/model/ingredients.ts). */
+export type IngredientId =
+  | 'limone'
+  | 'arancia'
+  | 'fragola'
+  | 'frutti-di-bosco'
+  | 'mirtillo'
+  | 'ciliegia'
+  | 'pesca'
+  | 'banana'
+  | 'mela'
+  | 'anguria'
+  | 'cocco'
+  | 'nocciola'
+  | 'mandorla'
+  | 'pistacchio'
+  | 'cioccolato'
+  | 'caffe'
+  | 'latte'
+  | 'uovo'
+  | 'vaniglia'
+  | 'yogurt'
+  | 'liquirizia'
+  | 'menta'
+  | 'caramello'
+  | 'miele'
+  | 'biscotto'
+  | 'torta'
+  | 'cono';
 
 /** Random offsets in [-1, 1], used when the "natural" effect is on. */
 export interface Jitter {
@@ -41,9 +73,20 @@ export type FontId =
   | 'bebas-neue'
   | 'amatic-sc'
   | 'fredoka'
-  | 'nunito';
+  | 'nunito'
+  | 'josefin-sans'
+  | 'jost'
+  | 'league-spartan';
 
-export type ThemeId = 'classica' | 'argento' | 'lavagna' | 'pastello';
+export type ThemeId =
+  | 'classica'
+  | 'lavagna'
+  | 'pastello'
+  | 'argento'
+  | 'carta'
+  | 'fondente'
+  | 'tavoletta'
+  | 'etichetta';
 
 /** Everything the user can tune on top of a preset. Each preset has its own defaults. */
 export interface Tunables {
@@ -62,6 +105,8 @@ export interface Tunables {
   minorFont: FontId;
   majorUppercase: boolean;
   leafIcon: boolean;
+  /** Small drawing of the flavour's main ingredient on each card. */
+  ingredientIcon: boolean;
 }
 
 export interface StyleConfig {

@@ -3,7 +3,8 @@ import type { StyleConfig, ThemeId, Tunables } from './types';
 // The "sane defaults" of every preset. The visuals that go with them (colours,
 // textures, card shapes) live in src/board/themes.ts.
 
-export const THEME_IDS: ThemeId[] = ['classica', 'argento', 'lavagna', 'pastello'];
+// Gallery order: the real board first, then the styles inspired by the shop's logo.
+export const THEME_IDS: ThemeId[] = ['classica', 'carta', 'fondente', 'tavoletta', 'etichetta', 'argento', 'lavagna', 'pastello'];
 
 export const DEFAULT_TITLE = 'I nostri gusti';
 
@@ -19,6 +20,7 @@ export const THEME_DEFAULTS: Record<ThemeId, Tunables> = {
     minorFont: 'patrick-hand',
     majorUppercase: true,
     leafIcon: true,
+    ingredientIcon: false,
   },
   argento: {
     frame: true,
@@ -31,6 +33,7 @@ export const THEME_DEFAULTS: Record<ThemeId, Tunables> = {
     minorFont: 'caveat',
     majorUppercase: true,
     leafIcon: true,
+    ingredientIcon: false,
   },
   lavagna: {
     frame: true,
@@ -43,6 +46,7 @@ export const THEME_DEFAULTS: Record<ThemeId, Tunables> = {
     minorFont: 'caveat',
     majorUppercase: true,
     leafIcon: true,
+    ingredientIcon: false,
   },
   pastello: {
     frame: false,
@@ -55,6 +59,59 @@ export const THEME_DEFAULTS: Record<ThemeId, Tunables> = {
     minorFont: 'nunito',
     majorUppercase: false,
     leafIcon: true,
+    ingredientIcon: false,
+  },
+  carta: {
+    frame: true,
+    header: true,
+    natural: false,
+    cardScale: 0.92,
+    background: 'crema',
+    card: 'filetti',
+    majorFont: 'josefin-sans',
+    minorFont: 'jost',
+    majorUppercase: true,
+    leafIcon: true,
+    ingredientIcon: false,
+  },
+  fondente: {
+    frame: true,
+    header: true,
+    natural: false,
+    cardScale: 0.88,
+    background: 'fondente',
+    card: 'oro',
+    majorFont: 'jost',
+    minorFont: 'jost',
+    majorUppercase: true,
+    leafIcon: true,
+    ingredientIcon: false,
+  },
+  tavoletta: {
+    frame: true,
+    header: true,
+    natural: false,
+    cardScale: 0.97,
+    background: 'fondente',
+    card: 'fondente',
+    majorFont: 'league-spartan',
+    minorFont: 'caveat',
+    majorUppercase: true,
+    leafIcon: true,
+    ingredientIcon: false,
+  },
+  etichetta: {
+    frame: false,
+    header: true,
+    natural: false,
+    cardScale: 0.86,
+    background: 'rovere',
+    card: 'bianca',
+    majorFont: 'league-spartan',
+    minorFont: 'jost',
+    majorUppercase: true,
+    leafIcon: true,
+    ingredientIcon: false,
   },
 };
 

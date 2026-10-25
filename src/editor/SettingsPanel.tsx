@@ -49,7 +49,7 @@ export function SettingsPanel() {
         <Swatches items={theme.backgrounds} value={t.background} onChange={(id) => setTunable('background', id)} />
         {theme.cards.length > 1 && (
           <>
-            <span className="field-label">Cartoncini</span>
+            <span className="field-label">{theme.cardsLabel ?? 'Cartoncini'}</span>
             <Swatches items={theme.cards} value={t.card} onChange={(id) => setTunable('card', id)} />
           </>
         )}
@@ -69,7 +69,7 @@ export function SettingsPanel() {
         </div>
 
         <label>
-          Dimensione cartoncini <output>{Math.round(t.cardScale * 100)}%</output>
+          Dimensione <output>{Math.round(t.cardScale * 100)}%</output>
           <input
             type="range"
             min={60}
@@ -96,6 +96,14 @@ export function SettingsPanel() {
         <label className="check">
           <input type="checkbox" checked={t.leafIcon} onChange={(e) => setTunable('leafIcon', e.target.checked)} />
           Foglia sui gusti vegani
+        </label>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={t.ingredientIcon}
+            onChange={(e) => setTunable('ingredientIcon', e.target.checked)}
+          />
+          Icona dell’ingrediente
         </label>
         <label className="check">
           <input

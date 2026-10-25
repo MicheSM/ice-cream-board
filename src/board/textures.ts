@@ -22,29 +22,41 @@ function noise(opts: { freq: string; octaves: number; color: [number, number, nu
   );
 }
 
+interface FacetOptions {
+  seed: string;
+  size: number;
+  count: number;
+  /** Radius of a facet: min + random up to min + range. */
+  radius: [number, number];
+  /** Number of corners: min + random up to min + range - 1. */
+  sides: [number, number];
+  base: string;
+  /** Dark-to-bright gradients: [angle, from, to]. */
+  shades: Array<[number, string, string]>;
+}
+
 /**
- * Hammered chrome: a hammered metal sheet is covered in small flat-ish dents,
- * and each dent reflects a different part of the room, so it looks like a
- * mosaic of facets ranging from dark blue-grey to bright white. We draw many
- * small random polygons, each filled with a dark-to-bright gradient, letting
- * them overlap. Shapes crossing the tile edge are repeated on the opposite
- * side so the tile repeats seamlessly.
+ * A mosaic of small flat facets, each catching the light differently: what
+ * hammered or crumpled metal looks like. We draw many random polygons, each
+ * filled with a dark-to-bright gradient, letting them overlap. Shapes
+ * crossing the tile edge are repeated on the opposite side so the tile
+ * repeats seamlessly.
  */
-function hammered(size: number, count: number) {
-  const rnd = seededRandom('hammered');
+function facets({ seed, size, count, radius, sides: sideRange, base, shades }: FacetOptions) {
+  const rnd = seededRandom(seed);
   const shapes: string[] = [];
   for (let i = 0; i < count; i++) {
     const x = rnd() * size;
     const y = rnd() * size;
-    const r = 6 + rnd() * 7;
-    const sides = 5 + Math.floor(rnd() * 3);
+    const r = radius[0] + rnd() * radius[1];
+    const sides = sideRange[0] + Math.floor(rnd() * sideRange[1]);
     const turn = rnd() * Math.PI;
     const pts = Array.from({ length: sides }, (_, k) => {
       const a = turn + (k / sides) * 2 * Math.PI;
       const rr = r * (0.7 + rnd() * 0.45);
       return [Math.cos(a) * rr, Math.sin(a) * rr];
     });
-    const g = `g${Math.floor(rnd() * 6)}`;
+    const g = `g${Math.floor(rnd() * shades.length)}`;
     for (const ox of [-size, 0, size])
       for (const oy of [-size, 0, size]) {
         const cx = x + ox;
@@ -55,21 +67,57 @@ function hammered(size: number, count: number) {
           );
       }
   }
-  const grad = (id: string, angle: number, from: string, to: string) =>
-    `<linearGradient id='${id}' gradientTransform='rotate(${angle} .5 .5)'>` +
-    `<stop offset='0' stop-color='${from}'/><stop offset='1' stop-color='${to}'/></linearGradient>`;
-  const defs = [
-    grad('g0', 45, '#59606c', '#f7f8fa'),
-    grad('g1', 225, '#6b7280', '#ffffff'),
-    grad('g2', 90, '#b3b9c2', '#ffffff'),
-    grad('g3', 0, '#5d6472', '#d6d9de'),
-    grad('g4', 135, '#e9ecf0', '#8d939d'),
-    grad('g5', 300, '#7c8594', '#f1f3f6'),
-  ].join('');
-  return svgUrl(`<defs>${defs}</defs><rect width='100%' height='100%' fill='#cdd1d7'/>${shapes.join('')}`, size);
+  const defs = shades
+    .map(
+      ([angle, from, to], i) =>
+        `<linearGradient id='g${i}' gradientTransform='rotate(${angle} .5 .5)'>` +
+        `<stop offset='0' stop-color='${from}'/><stop offset='1' stop-color='${to}'/></linearGradient>`,
+    )
+    .join('');
+  return svgUrl(`<defs>${defs}</defs><rect width='100%' height='100%' fill='${base}'/>${shapes.join('')}`, size);
 }
 
-export const HAMMERED_SILVER = hammered(240, 520);
+/**
+ * Hammered chrome: a hammered metal sheet is covered in small dents, and each
+ * dent reflects a different part of the room, from dark blue-grey to white.
+ */
+export const HAMMERED_SILVER = facets({
+  seed: 'hammered',
+  size: 240,
+  count: 520,
+  radius: [6, 7],
+  sides: [5, 3],
+  base: '#cdd1d7',
+  shades: [
+    [45, '#59606c', '#f7f8fa'],
+    [225, '#6b7280', '#ffffff'],
+    [90, '#b3b9c2', '#ffffff'],
+    [0, '#5d6472', '#d6d9de'],
+    [135, '#e9ecf0', '#8d939d'],
+    [300, '#7c8594', '#f1f3f6'],
+  ],
+});
+
+/**
+ * Crumpled gold foil, like the wrapper of a chocolate bar: the same idea with
+ * bigger, sharper (triangular) facets in golds from deep amber to almost white.
+ */
+export const GOLD_FOIL = facets({
+  seed: 'foil',
+  size: 300,
+  count: 260,
+  radius: [14, 26],
+  sides: [3, 2],
+  base: '#c49a52',
+  shades: [
+    [30, '#8a6326', '#f3dc9e'],
+    [200, '#a97d38', '#fff1c8'],
+    [110, '#d8b66e', '#7c5620'],
+    [300, '#e9cd8a', '#9b7130'],
+    [70, '#6f4c1a', '#d6b06a'],
+    [160, '#f7e6b2', '#b88b44'],
+  ],
+});
 
 /**
  * Wood: noise stretched along one axis gives long streaks; a colour matrix
@@ -102,3 +150,38 @@ export const CHALK_SMUDGES = noise({ freq: '0.004 0.008', octaves: 3, color: [25
 export const CARD_GRAIN = noise({ freq: '0.7', octaves: 2, color: [140, 120, 105], alpha: 0.22, seed: 5, size: 256 });
 export const CARD_FIBERS = noise({ freq: '0.012 0.25', octaves: 2, color: [10, 6, 4], alpha: 0.35, seed: 9, size: 512 });
 export const FINE_GRAIN = noise({ freq: '1.2', octaves: 1, color: [90, 80, 70], alpha: 0.1, seed: 31, size: 200 });
+
+/**
+ * Light oak slats, like the wall behind the shop's counter: vertical boards
+ * of slightly different tones, a grain made of noise stretched vertically,
+ * and a dark groove between boards. The tile is a whole number of boards
+ * wide, so it repeats without a visible seam.
+ */
+function oakSlats() {
+  const rnd = seededRandom('oak');
+  const board = 60;
+  const count = 10;
+  const size = board * count;
+  const tones = ['#c7a175', '#c09a6c', '#cca77c', '#c39d70', '#bd966a'];
+  const boards = Array.from({ length: count }, (_, i) => {
+    const x = i * board;
+    const tone = tones[Math.floor(rnd() * tones.length)];
+    return (
+      `<rect x='${x}' width='${board}' height='${size}' fill='${tone}'/>` +
+      // Each board is a little darker towards its right edge, then the groove.
+      `<rect x='${x}' width='${board}' height='${size}' fill='url(#side)'/>` +
+      `<rect x='${x}' width='3' height='${size}' fill='#4a3320' opacity='.55'/>`
+    );
+  });
+  return svgUrl(
+    `<defs><linearGradient id='side'><stop offset='0' stop-color='#fff' stop-opacity='.1'/>` +
+      `<stop offset='.6' stop-color='#fff' stop-opacity='0'/><stop offset='1' stop-color='#000' stop-opacity='.08'/></linearGradient></defs>` +
+      `<filter id='g' x='0' y='0' width='100%' height='100%'>` +
+      `<feTurbulence type='fractalNoise' baseFrequency='0.3 0.004' numOctaves='3' seed='12' stitchTiles='stitch'/>` +
+      `<feColorMatrix values='0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .1  .8 0 0 0 -.32'/>` +
+      `</filter>${boards.join('')}<rect width='100%' height='100%' filter='url(#g)'/>`,
+    size,
+  );
+}
+
+export const OAK_SLATS = oakSlats();

@@ -27,13 +27,14 @@
 | B4 | Vegan is a property of the flavour. The style decides the colours: vegan = green, non-vegan = white/neutral. |
 | B5 | Optional leaf icon on vegan cards. |
 | B6 | "Esaurito / Sold out" mark without removing the card. |
+| B7 | Optional icon of the flavour's main ingredient (toggle per preset). Guessed from the name, can be chosen by hand or turned off per flavour. Single-colour, following the vegan colour code. |
 | C1 | Background + optional frame. Toggling the frame re-flows the cards to use the space. |
 | C2 | **Grid**: rows × columns. Place or remove a card in any cell without moving the others. All cards have the same, configurable size. *(Manual free placement dropped on 2026-10-24: the grid is enough.)* |
 | C4 | Effect: **Preciso / Naturale** (small random rotation and offset). Pressing Naturale again re-rolls. Stable across reloads. |
 | D1 | Major/minor text slots. Without a minor, the major gets the whole card. |
 | D2 | Font sizes consistent across cards (board-wide size). Only long names shrink or wrap to 2 lines. The minor is never bigger than the major. |
 | D3 | Fonts chosen from a small curated list, bundled offline. |
-| E1 | Style presets: **Classica** (replica of the real board), **Argento** (shop logo/poster), **Lavagna**, **Pastello**, each with the vegan colour code. |
+| E1 | Style presets: **Classica** (replica of the real board); in the shop's logo colours **Carta**, **Fondente**, **Tavoletta**, **Etichetta**, **Polaroid**; then **Lavagna** and **Pastello**. Each keeps the vegan colour code. |
 | E2 | Every preset is tunable (colours, frame, logo header, effect, size, fonts…) with a reset to its sane defaults. Tweaks are remembered per preset. |
 | F2 | Undo/redo. |
 | F1 | Italian, intuitive editor with a live preview. Works with mouse and touch. Autosave. |

@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.4.0: Argento styles (2026-10-25)
+
+- Four new presets in the colours of the shop's logo (chocolate brown, gold, silver), simple rather than fancy:
+  - **Carta**: like a printed menu. No cards, just the names in columns on light paper, spaced capitals, gold hairlines between flavours (or between columns, or none), a thick-and-thin gold border.
+  - **Fondente**: dark chocolate background, gold frame with the logo's silver line, each flavour in a thin gold frame (or a plain gold line, or no frame at all).
+  - **Tavoletta**: the board is a bar of chocolate in crumpled gold foil, with a paper band carrying the logo. Every flavour is a square of the bar; empty cells are plain squares. Dark, milk or white chocolate.
+  - **Etichetta**: every flavour is a white label with a gold border and a silver line, like the logo, on light oak slats like the wall behind the counter (or white, grey or chocolate).
+- **Ingredient icons** (new "Icona dell'ingrediente" option in every preset, off by default): each flavour shows a small drawing of its main ingredient, in a column on the left of the card (in the menu layouts, just before the name). 27 icons drawn for the app in one line style: fruits, nuts, chocolate, coffee, milk, custard, vanilla, yogurt, licorice, mint, caramel, honey, cookie, cake, cone. They take the preset's ink, and are green on vegan flavours.
+  - The icon is guessed from the name (in Italian or English): "Cioccolato al latte" gets chocolate rather than milk, "Crema al caffè" gets coffee. The flavour form has an **Icona** picker to choose another one or none; "Auto" goes back to the guess.
+- The old Argento preset is now called **Polaroid**.
+- 3 more bundled fonts, all clean sans-serifs: Josefin Sans ("Geometrico"), Jost ("Essenziale"), League Spartan ("Locandina", like the inauguration poster). In capitals they get a little extra letter spacing, which the text fitting takes into account.
+- In the menu-style layouts, the vegan leaf follows the name like a word instead of sitting in a corner.
+- The "Esaurito · Sold out" strip uses each preset's own header font, and shrinks to fit narrow cards.
+- The card colour option is named after what it changes in each preset (Decorazione, Riquadri, Cioccolato, Etichette), and the size slider is just "Dimensione".
+- Fix: changing a font or size could silently reset the line spacing of two-line names.
+- Checked on a CPU slowed down 6× with the 8 live thumbnails and icons on everywhere: a preset switch shows in about 60 ms, saving a flavour in about 55 ms.
+
 ## v0.3.0: shop-ready (burst 3, to be confirmed at the shop)
 
 - Published on GitHub Pages: https://michesm.github.io/ice-cream-board/, rebuilt and republished automatically on every push to `main` (only if the tests pass).

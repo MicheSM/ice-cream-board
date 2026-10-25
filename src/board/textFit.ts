@@ -94,17 +94,22 @@ export interface FitOptions {
   soloBox: Box;
   majorFont: string;
   minorFont: string;
+  /** Letter spacing of the major text, in em (CSS letter-spacing adds it after every character). */
+  majorTracking?: number;
   measure: Measure;
 }
 
 export function fitBoard(cards: Array<{ major: string; minor: string }>, opts: FitOptions): CardFit[] {
-  const { majorBox, minorBox, soloBox, majorFont, minorFont, measure } = opts;
+  const { majorBox, minorBox, soloBox, majorFont, minorFont, majorTracking = 0, measure } = opts;
+  const measureMajor: Measure = majorTracking
+    ? (text, font) => measure(text, font) + majorTracking * 100 * [...text].length
+    : measure;
 
   const prepared = cards.map((c) => {
     const hasMinor = c.minor.trim() !== '';
     return {
       hasMinor,
-      majorOptions: candidates(c.major, hasMinor ? majorBox : soloBox, majorFont, measure),
+      majorOptions: candidates(c.major, hasMinor ? majorBox : soloBox, majorFont, measureMajor),
       minorOptions: hasMinor ? candidates(c.minor, minorBox, minorFont, measure) : null,
     };
   });

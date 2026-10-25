@@ -35,8 +35,18 @@
 
 .header-rule {
   flex: 1;
-  height: 3px;
   border-radius: 2px;
+}
+
+/* A strip across the whole board, behind the header (the paper band round a chocolate bar). */
+.header-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.divider {
+  position: absolute;
 }
 
 .header-logo {
@@ -84,6 +94,30 @@
     0 10px 24px rgba(60, 40, 30, 0.1);
 }
 
+.card.kind-tablet {
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
+}
+
+/*
+ * A chocolate square's sloped edge: a box border with four different colours
+ * is drawn as four trapezoids, which is exactly what a bevel looks like.
+ * Light comes from the top left, so the top and left slopes are lighter.
+ * The colours are see-through, so the same bevel works on any chocolate.
+ */
+.card-bevel {
+  position: absolute;
+  inset: 0;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.13) rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.36) rgba(255, 255, 255, 0.06);
+}
+
+/* Framed cards: the border (and the thin line inside it) is its own layer. */
+.card-edge {
+  position: absolute;
+  inset: 0;
+  border-style: solid;
+}
+
 .chalk-outline {
   position: absolute;
   inset: 0;
@@ -107,17 +141,23 @@
   white-space: nowrap;
 }
 
+/* Menu style: no card to hold them together, so the subtitle sits right under the name. */
+.card.kind-menu .slot-major {
+  align-items: flex-end;
+}
+
+.card.kind-menu .slot-minor {
+  align-items: flex-start;
+}
+
 .chalky {
   filter: url(#chalk-text);
 }
 
 .card.sold-out .card-slot,
-.card.sold-out .polaroid-window {
+.card.sold-out .polaroid-window,
+.card.sold-out > .ingredient {
   opacity: 0.35;
-}
-
-.leaf {
-  position: absolute;
 }
 
 .sold-out-band {

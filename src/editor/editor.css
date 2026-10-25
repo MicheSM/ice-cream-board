@@ -594,3 +594,42 @@ label.indent {
 .topbar-actions button.icon {
   font-size: 19px;
 }
+
+/* Ingredient icon picker in the flavour form. */
+.icon-picker summary {
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-picker .ingredient {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 4px;
+  margin: 8px 0 6px;
+}
+
+.icon-grid button {
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.icon-grid button.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.icon-picker > small {
+  color: var(--muted);
+}

@@ -50,15 +50,28 @@ export function cardSize(board: BoardConfig, chrome: Chrome, scale: number): { w
   return { w: (a.w / board.cols) * scale, h: (a.h / board.rows) * scale };
 }
 
-export type CardKind = 'cardboard' | 'polaroid' | 'chalk' | 'rounded';
+/**
+ * What a flavour looks like:
+ *  - cardboard, polaroid, chalk, rounded: a card on the board;
+ *  - framed: a card with a thin border and a second line inside it, like the
+ *    logo (filled like a label, or just the lines);
+ *  - tablet: one square of a chocolate bar;
+ *  - menu: no card at all, just the text, like a printed menu.
+ */
+export type CardKind = 'cardboard' | 'polaroid' | 'chalk' | 'rounded' | 'framed' | 'tablet' | 'menu';
 
 /**
  * Where things go inside a card (card coordinates):
  *  - major/minor: the two text slots when the card has a minor text;
  *  - solo: the major's slot when there is no minor;
  *  - window: the "photo" area of a polaroid;
- *  - leaf: the vegan icon. When it's shown, the text slot it sits next to
- *    gets narrower on *both* sides, so text stays centred and never touches it.
+ *  - leaf: the vegan icon, top right. When it's shown, the text slot next to
+ *    it gets narrower on *both* sides, so text stays centred and never
+ *    touches it.
+ *  - icon: the ingredient icon, in a column on the left; the text is then
+ *    centred in the rest of the card.
+ *  - inline: the leaf and the icon go in the text line instead, before and
+ *    after the name like words; only their sizes count.
  */
 export interface CardLayout {
   major: Rect;
@@ -66,43 +79,99 @@ export interface CardLayout {
   solo: Rect;
   window?: Rect;
   leaf: Rect;
+  icon: Rect;
+  inline?: boolean;
+}
+
+/** Which marks the cards carry: the vegan leaf and the ingredient icon. */
+export interface Marks {
+  leaf: boolean;
+  icon: boolean;
 }
 
 const MAJOR_SHARE = 0.56;
 
-const narrower = (r: Rect, by: number): Rect => ({ ...r, x: r.x + by, w: r.w - 2 * by });
+/** How thick the drawn edge of a card is (bevel, border), as a fraction of its height. */
+const EDGE: Partial<Record<CardKind, number>> = { framed: 0.07, tablet: 0.1 };
+/** Space between an inline leaf or icon and the name, as a fraction of the card height. */
+export const INLINE_GAP = 0.05;
 
-export function cardLayout(kind: CardKind, size: { w: number; h: number }, leaf: boolean): CardLayout {
+const narrower = (r: Rect, by: number): Rect => ({ ...r, x: r.x + by, w: r.w - 2 * by });
+/** `r` giving up `left` px on its left and `right` px on its right. */
+const trimmed = (r: Rect, left: number, right: number): Rect => ({ ...r, x: r.x + left, w: r.w - left - right });
+
+export function cardLayout(kind: CardKind, size: { w: number; h: number }, marks: Marks): CardLayout {
   const { w, h } = size;
   if (kind === 'polaroid') {
-    // White border, a "photo" window with the name, the minor and the leaf on the strip below.
+    // White border, a "photo" window with the name (and the icon on its left),
+    // the minor and the leaf on the strip below.
     const b = h * 0.075;
     const window = { x: b, y: b, w: w - 2 * b, h: h * 0.64 };
     const px = window.w * 0.07;
     const py = window.h * 0.12;
-    const major = { x: window.x + px, y: window.y + py, w: window.w - 2 * px, h: window.h - 2 * py };
+    let major = { x: window.x + px, y: window.y + py, w: window.w - 2 * px, h: window.h - 2 * py };
     const stripTop = window.y + window.h;
     const stripH = h - stripTop;
     const L = h * 0.17;
+    const I = h * 0.3;
     const leafRect = { x: w - b * 1.4 - L, y: stripTop + (stripH - L) / 2, w: L, h: L };
+    const iconRect = { x: window.x + b, y: window.y + (window.h - I) / 2, w: I, h: I };
     let minor = { x: b * 2, y: stripTop + h * 0.035, w: w - 4 * b, h: stripH - h * 0.07 };
-    if (leaf) minor = narrower(minor, Math.max(0, minor.x + minor.w - leafRect.x) + h * 0.02);
-    return { major, minor, solo: major, window, leaf: leafRect };
+    if (marks.leaf) minor = narrower(minor, Math.max(0, minor.x + minor.w - leafRect.x) + h * 0.02);
+    if (marks.icon) major = trimmed(major, Math.max(0, iconRect.x + I + h * 0.04 - major.x), 0);
+    return { major, minor, solo: major, window, leaf: leafRect, icon: iconRect };
   }
-  const px = w * 0.07;
+  const px = w * (kind === 'menu' ? 0.04 : 0.07);
   const py = h * 0.1;
   const content = { x: px, y: py, w: w - 2 * px, h: h - 2 * py };
-  const L = h * 0.16;
-  const leafRect = { x: w - w * 0.025 - L, y: h * 0.06, w: L, h: L };
-  const reserve = leaf ? Math.max(0, content.x + content.w - leafRect.x) + h * 0.015 : 0;
   const major = { ...content, h: content.h * MAJOR_SHARE };
+  const minor = { ...content, y: content.y + content.h * MAJOR_SHARE, h: content.h * (1 - MAJOR_SHARE) };
+  const L = h * (kind === 'menu' ? 0.2 : 0.16);
+  const I = h * 0.3;
+
+  if (kind === 'menu') {
+    // Icon, name and leaf are centred together, so the name only gives up their widths.
+    const gap = h * INLINE_GAP;
+    const reserve = ((marks.leaf ? L + gap : 0) + (marks.icon ? I + gap : 0)) / 2;
+    return {
+      major: narrower(major, reserve),
+      minor,
+      solo: narrower(content, reserve),
+      leaf: { x: 0, y: 0, w: L, h: L },
+      icon: { x: 0, y: 0, w: I, h: I },
+      inline: true,
+    };
+  }
+
+  // Leaf in the top-right corner, icon on the left, both inside the card's edge.
+  const edge = h * (EDGE[kind] ?? 0);
+  const inX = Math.max(w * 0.025, edge + h * 0.04);
+  const inY = Math.max(h * 0.06, edge + h * 0.04);
+  const leafRect = { x: w - inX - L, y: inY, w: L, h: L };
+  const iconRect = { x: inX, y: (h - I) / 2, w: I, h: I };
+  const leafReserve = marks.leaf ? Math.max(0, content.x + content.w - leafRect.x) + h * 0.015 : 0;
+  if (marks.icon) {
+    // The text moves right of the icon column; the leaf only needs its own side.
+    const left = Math.max(0, iconRect.x + I + h * 0.04 - content.x);
+    return {
+      major: trimmed(major, left, leafReserve),
+      minor: trimmed(minor, left, leafReserve),
+      solo: trimmed(content, left, leafReserve),
+      leaf: leafRect,
+      icon: iconRect,
+    };
+  }
   return {
-    major: narrower(major, reserve),
-    minor: { ...content, y: content.y + content.h * MAJOR_SHARE, h: content.h * (1 - MAJOR_SHARE) },
-    solo: narrower(content, reserve),
+    major: narrower(major, leafReserve),
+    minor,
+    solo: narrower(content, leafReserve),
     leaf: leafRect,
+    icon: iconRect,
   };
 }
+
+/** Thickness of a chocolate square's bevel, in px. */
+export const bevelOf = (size: { w: number; h: number }) => Math.round(Math.min(size.w, size.h) * (EDGE.tablet ?? 0));
 
 /** Turns a card's stored random numbers into an actual offset and rotation. */
 export function jitterTransform(j: Jitter, natural: boolean, cell: Rect) {
